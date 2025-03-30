@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadoras Médicas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: #1e1e1e;
+            color: #f8f8f2;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-container input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 60%;
+            max-width: 400px;
+        }
+
+        .search-container button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .dark-mode-button {
+            background: none;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
+        }
+
+        .dark-mode .dark-mode-button {
+            color: #f8f8f2;
+        }
+
+        #calculadoras-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .calculator {
+            background-color: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark-mode .calculator {
+            background-color: #333;
+            color: #eee;
+            box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+        }
+
+        .config-label {
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .dark-mode .config-label {
+            color: #bbb;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dark-mode .input-group label {
+            color: #eee;
+        }
+
+        .input-group input[type="number"],
+        .input-group select {
+            width: calc(100% - 12px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+            color: #333;
+            background-color: white;
+            transition: border-color 0.3s ease, color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .dark-mode .input-group input[type="number"],
+        .dark-mode .input-group select {
+            border-color: #555;
+            color: #eee;
+            background-color: #444;
+        }
+
+        .calculator button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .calculator button:hover {
+            background-color: #1e7e34;
+        }
+
+        .dark-mode .calculator button {
+            background-color: #38c172;
+        }
+
+        .dark-mode .calculator button:hover {
+            background-color: #2ba759;
+        }
+
+        .resultado {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .dark-mode .resultado {
+            background-color: #444;
+            color: #eee;
+            border-color: #555;
+        }
+
+        .alerta {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .dark-mode .alerta {
+            background-color: #c82333;
+        }
+
+        /* Estilos para el texto modificable */
+        .editable-text {
+            padding: 10px;
+            border: 1px solid transparent;
+            cursor: text;
+            transition: border-color 0.3s ease;
+        }
+
+        .editable-text:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Centrar el título principal si lo agregas */
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .dark-mode h1 {
+            color: #f8f8f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Buscar...">
+                <button onclick="searchCalculators()">Buscar</button>
+            </div>
+            <button class="dark-mode-button" onclick="toggleDarkMode()">🌙</button>
+        </header>
+
+        <h1><span class="editable-text" contenteditable="true">Médicamentos y dosis pediátricas</span></h1>
+
+        <div id="calculadoras-container">
+            </div>
+    </div>
+
+    <script>
+        const CONFIG_CALCULADORAS = [
+            { name: "Cefepime iv-im 100-150 mg/kg/día (Meningitis y infección por pseudomona aeruginosa 150 mg/kg/día  c/8-12 horas c/8 horas)", divisor: 40, dosisMax: 6 },
+            { name: "Imipenem iv-im 60-100 mg/kg/día c/6-8 horas", divisor: 5, dosisMax: 4 },
+            { name: "Meropenem iv 60 mg/kg/día (Meningitis y infección por pseudomona aeruginosa 120 mg/kg/día  c/8 horas )", divisor: 50, dosisMax: 6 },
+            { name: "Ertapenem iv-im 30 mg/kg/día  c/12 horas c/24 horas en mayores de 12 años", divisor: 20, dosisMax: 1 },
+            { name: "Aztreonam iv-im 90-120 mg/kg/día (Fibrosis quistica 200 mg/kg/día  c/6-8 horas)", divisor: 20, dosisMax: 8 },
+            { name: "Vancomicina iv 40 mg/kg/día (Meningitis 60 mg/kg/día)  c/6-8 horas", divisor: 5, dosisMax: 2 },
+            { name: "Gentamicina iv-im 5-7 mg/kg/día (Fibrosis quistica 7-10 mg/kg/día)  c/8 horas", divisor: 10, dosisMax: 0.5 },
+            { name: "Amikacina iv-im 15-22.5  mg/kg/día  c/8 horas", divisor: 5, dosisMax: 1.5 },
+            { name: "Tobramicina iv-im 5-7 mg/kg/día  c/8 horas ", divisor: 10, dosisMax: 0.5 },
+            { name: "Neltimicina iv-im 5-7 mg/kg/día c/8 horas ", divisor: 10, dosisMax: 0.5 },
+            { name: "Kanamicina iv-im 15-30 mg/kg/día c/8 horas", divisor: 5, dosisMax: 1 },
+            { name: "Estreptomicina iv-im 20-40 mg/kg/día c/8-12 horas ", divisor: 10, dosisMax: 1.5 },
+            { name: "Eritromicina vo 30-50 mg/kg/día iv 15-50 mg/kg/día  c/6-8 horas  c/6 horas", divisor: 5, dosisMax: 4 },
+            { name: "Azitromicina Faringoamigdalitis 12 mg/kg/día otitis media 10 mg/kg/día vo por 1 día y luego 5 mg/kg/día vo por 4 días DOSIS TOTAL: 30 mg/kg/día los días dependerán de la patología ", divisor: 1, dosisMax: 0.5 },
+            { name: "Clindamicina vev 30 mg/kg/día c/8 horas", divisor: 20, dosisMax: 4.5 },
+            { name: "Clorafenicol vo-iv 50-75 mg/kg/día (Meningitis 75-100 mg/kg/día) c/6 horas", divisor: 50, dosisMax: 4 },
+            { name: "Trimetopin/Sulfametoxazol vo-vi 5-10 mg/kg/día la dosis es en base al trimetopim NO RECOMENDADO EN MENORES DE 6 SEMANAS DE EDAD c/12 horas", divisor: 1, dosisMax: 1.2 },
+            { name: "Quinupristina/Dalfopristina iv 15-22.5 mg/kg/día c/8-12 horas", divisor: 2, dosisMax: 0 },
+            { name: "Ceftizoxina iv-im 150-200 mg/kg/día c/6-8 horas", divisor: 20, dosisMax: 12 },
+            { name: "Cefoperazona iv-im 100-150 mg/kg/día (infección severa 150-250 mg/kg/día) c/8-12 horas", divisor: 25, dosisMax: 12 },
+            { name: "Cefoperazona/Sulbactam iv-im 100-150 mg/kg/día (infeccion severa 150-250 mg/kg/día) c/8-12 horas", divisor: 25, dosisMax: 12 },
+            { name: "Ticarcilina im 50-100 mg/kg/día iv 200-300 mg/kg/día (ifección urinaria 50-100 mg/kg/día infección severa 300-400 mg/kg/día) c6-8 horas - c/4-6 horas", divisor: 50, dosisMax: 24 },
+            { name: "Ticarcilina/Clavulanico iv 200-300 mg/kg/día (infección urinaria 50-100 mg/kg/día infección severa 300-400 mg/kg/día) c/4-6 horas", divisor: 50, dosisMax: 24 },
+            { name: "Piperacilina iv 200-300 mg/kg/día (infección severa y fibrosis quística 300-400 mg/kg/día) c/4-6 horas", divisor: 25, dosisMax: 24 },
+            { name: "Piperacilina/Tazobactam iv 200-300 mg/kg/día (infección severa y fibrosis quística 300-400 mg/kg/día) c/6-8 horas", divisor: 25, dosisMax: 18 },
+            { name: "Mezlocilina iv-im 300 mg/kg/día c/4-6 horas", divisor: 50, dosisMax: 24 },
+            { name: "Cefalotina iv 75-150 mg/kg/día c/4-6 horas", divisor: 100, dosisMax: 12 },
+            { name: "Cefazolina iv-im 50-100 mg/kg/día c/8 horas ", divisor: 100, dosisMax: 6 },
+            { name: "Cefuroxima vo 30-40 mg/kg/día im-iv 75-150 mg/kg/día c/12 horas c/6-8 horas", divisor: 100, dosisMax: 12 },
+            { name: "Cefamandol iv-im 100-150 mg/kg/día c/4-6 horas", divisor: 100, dosisMax: 6 },
+            { name: "Cefonicid iv-im 50 mg/kg/día c/24 horas", divisor: 100, dosisMax: 2 },
+            { name: "Cefotetan iv-im 40-80 mg/kg/día c/12 horas", divisor: 100, dosisMax: 6 },
+            { name: "Cefoxitin iv-im 80-160 mg/kg/día c/4-6 horas", divisor: 200, dosisMax: 12 },
+            { name: "Cefotaxima iv-im 100-300 mg/kg/día (Meningitis 200-300 mg/kg/día) c/6-8 horas", divisor: 60, dosisMax: 12 },
+            { name: "Ceftriaxone iv-im 50-75 mg/kg/día (Meningitis 80-120 mg/kg/día Otitis media 50 mg/kg/día por 1-3 días, se recomiendapor 3 días en infeccion por sterptococcus pneumoniae resistente a penicilina) c/12-24 horas", divisor: 50, dosisMax: 4 },
+            { name: "Ceftazidima iv-im 100-150 mg/kg/día (Meningitis  150 mg/kg/día) c/8-12 horas", divisor: 40, dosisMax: 6 },
+            { name: "Ciprofloxacina infecciones severas 20-30 mg/kg/día iv Fibrosis quistica 30-40 mg/kg/día vo  c/8-12 horas c-12 horas", divisor: 1, dosisMax: 1.5 },
+            { name: "Levofloxacina vo-vi menor a 5 años20 mg/kg/día mayor de 5 años 10 mg/kg/día  c/12 horas  c/24 horas ", divisor: 2, dosisMax: 0.5 },
+            { name: "Oxacilina vo 50-100 mg/kg/día im-iv 100 mg/kg/día infección severa 150-200 mg/kg/dia iv  c/4-6 horas", divisor: 100, dosisMax: 12 },
+            { name: "Nafcilina vo 50-100 mg/kg/día iv-im 150 mg/kg/día  c/6 horas", divisor: 50, dosisMax: 12 },
+            { name: "Ampicilina vo 50-100 mg/kg/día iv 100-200 mg/kg/día (Meningitis 200-400 mg/kg/día, infección no meninges por streptococcus pneunomiae con resistenccia intermediaría a penicilina 300-400 mg/kg/día  c/8 horas  c/4-6 horas  )", divisor: 50, dosisMax: 12 },
+            { name: "Ampicilina/Sulbactam vo 50 mg/kg/día iv 100-200 mg/kg/día  c/6-8 horas  c/6 horas", divisor: 50, dosisMax: 12 },
+            { name: "Amoxcicilina/Clavulanico vo 40-45 mg/kg/día  iv 90-120 mg/kg/día la dosis es en base a amoxicilina (infección meningea por streptococcus pneumoniae con resistencia intermediaría a la penicilina 80-120 mg/kg/día vo) c/8-12 horas  c/6-8 horas", divisor: 50, dosisMax: 4 },
+            { name: "Rifampicina vo-vi 15-20 mg/kg/día  c/12-24 horas ", divisor: 3, dosisMax: 0.6 },
+            { name: "Doxicilina vo-iv 2-4 mg/kg/día c/12-24 horas NO RECOMENDADOS EN NIÑOS MENORES A 8 AÑOS", divisor: 1, dosisMax: 0.2 },
+            { name: "Colistina iv-im 2.5-5 mg/kg/día fibrosis quistica 5-8 mg/kg/día iv  c/8 horas ", divisor: 75, dosisMax: 0.16 },
+            { name: "Linezolid vo-iv menores a 5 años 30 mg/kg/día  mayores a 5 años 20 mg/kg/día  c/8 horas  c/12 horas", divisor: 1, dosisMax: 1.2 },
+            { name: "", divisor: 43, dosisMax: 6.7 },
+            { name: "", divisor: 36, dosisMax: 5.7 },
+            { name: "", divisor: 45, dosisMax: 7.0 }
+        ];
+
+        function crearCalculadora(config) {
+            return `
+            <div class="calculator"
+                data-divisor="${config.divisor}"
+                data-dosis-max="${config.dosisMax}">
+
+                <div class="config-label">
+                    <span class="editable-text" contenteditable="true">${config.name}</span><br>
+                    <small><span class="editable-text" contenteditable="true">D.V.P:</span> ${config.divisor} | <span class="editable-text" contenteditable="true">Máx:</span> ${config.dosisMax}g</small>
+                </div>
+
+                <div class="input-group">
+                    <label><span class="editable-text" contenteditable="true">Dosis (mg/kg):</span></label>
+                    <input type="number" class="dosis" step="0.1" placeholder="Ej: 50">
+                </div>
+
+                <div class="input-group">
+                    <label><span class="editable-text" contenteditable="true">Peso (kg):</span></label>
+                    <input type="number" class="peso" step="0.1" placeholder="Ej: 70">
+                </div>
+
+                <div class="input-group">
+                    <label><span class="editable-text" contenteditable="true">Intervalo:</span></label>
+                    <select class="intervalo">
+                        <option value="4"><span class="editable-text" contenteditable="true">Cada 6 horas</span></option>
+                        <option value="3"><span class="editable-text" contenteditable="true">Cada 8 horas</span></option>
+                        <option value="2"><span class="editable-text" contenteditable="true">Cada 12 horas</span></option>
+                        <option value="1"><span class="editable-text" contenteditable="true">Cada 24 horas</span></option>
+                    </select>
+                </div>
+
+                <button onclick="calcular(this)">📊 Calcular</button>
+
+                <div class="resultado">
+                    <strong><span class="editable-text" contenteditable="true">Mg día:</span></strong> <span class="paso1">-</span><br>
+                    <strong><span class="editable-text" contenteditable="true">Mg dosis:</span></strong> <span class="paso2">-</span><br>
+                    <strong><span class="editable-text" contenteditable="true">Dilución ml:</span></strong> <span class="paso3">-</span>
+                </div>
+
+                <div class="alerta"><span class="editable-text" contenteditable="true">¡ADVERTENCIA! Dosis máxima:</span> ${config.dosisMax}gr</div>
+            </div>`;
+        }
+
+        // Generar calculadoras
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('calculadoras-container');
+            CONFIG_CALCULADORAS.forEach((config) => {
+                container.innerHTML += crearCalculadora(config);
+            });
+        });
+
+        function calcular(btn) {
+            const calculator = btn.closest('.calculator');
+            const get = (cls) => calculator.querySelector(`.${cls}`);
+
+            const config = {
+                divisor: parseFloat(calculator.dataset.divisor),
+                dosisMax: parseFloat(calculator.dataset.dosisMax)
+            };
+
+            const valores = {
+                dosis: parseFloat(get('dosis').value) || 0,
+                peso: parseFloat(get('peso').value) || 0,
+                intervalo: parseInt(get('intervalo').value)
+            };
+
+            // Cálculos
+            const resultados = {
+                paso1: valores.dosis * valores.peso,
+                paso2: (valores.dosis * valores.peso) / valores.intervalo,
+                paso3: ((valores.dosis * valores.peso) / valores.intervalo) / config.divisor
+            };
+
+            // Mostrar resultados
+            get('paso1').textContent = `${resultados.paso1.toFixed(2)} mg`;
+            get('paso2').textContent = `${resultados.paso2.toFixed(2)} mg`;
+            get('paso3').textContent = `${resultados.paso3.toFixed(2)} ml`;
+
+            // Control de alerta
+            const alerta = get('alerta');
+            const alertaText = alerta.querySelector('.editable-text');
+            if (alertaText) {
+                alerta.textContent = alertaText.textContent + ` ${config.dosisMax}gr`;
+            } else {
+                alerta.textContent = `¡ADVERTENCIA! Dosis máxima: ${config.dosisMax}gr`;
+            }
+            alerta.style.display = resultados.paso3 > config.dosisMax ? 'block' : 'none';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function searchCalculators() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const calculators = document.querySelectorAll('.calculator');
+
+            calculators.forEach(calculator => {
+                const textContent = calculator.textContent.toLowerCase();
+                if (textContent.includes(searchTerm)) {
+                    calculator.style.display = 'block';
+                } else {
+                    calculator.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
